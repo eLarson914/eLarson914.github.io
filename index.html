@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+
+      <head>
+            <meta charset="utf-8" />
+            <title>Particles</title>
+            <link rel="icon" href="icon.png">
+
+            <script src="apricot.js" type="module"></script>
+
+            <script type="text/javascript" src="./math.js"></script>
+
+            <style>
+                  body {
+                        margin: 0px;
+                        height: 0px;
+                  }
+                  canvas {
+                        position: fixed;
+                        top: 0px;
+                        left: 0px;
+                        z-index: -1;
+                  }
+                  
+                  table {
+                        vertical-align: middle;
+                  }
+                  
+                  input[type="text"] { width: 200px; }
+                  input[type="number"] {width: 50px; }
+                  button {
+                        min-width: 80px;
+                        border-radius: 5px;
+                        background-color: antiquewhite;
+                  }
+                  
+                  /* FONT ------------------------------- */
+
+                  /* font for bigger text */
+                  h1 {
+                        color: antiquewhite;
+                  }
+                  h3 { 
+                        margin: 0px;
+                        text-align: center;
+                        font-size: 16px;
+                        font-weight: normal;
+                        font-family: Arial, Helvetica, sans-serif;
+                        color: antiquewhite;
+                  }
+
+                  /* font for smaller text */
+                  table, label, ul, p { 
+                        font-family: Arial, Helvetica, sans-serif;
+                        font-size: 14px;
+                        color: antiquewhite;
+                  }
+                  input, button {
+                        font-family: Arial, Helvetica, sans-serif;
+                        font-size: 14px;
+                        color: black;
+                  }
+                  /* ---------------------------------- */
+
+                  .numberInputShort {
+                        width: 50px;
+                  }
+                  .numberInputLong {
+                        width: 80px;
+                  }
+                  
+                  /* rounded menus */
+                  .blob { 
+                        border: 1px solid antiquewhite;
+                        border-radius: 10px;
+                        padding: 12px;
+                        min-width: 100px;
+                        background-color: rgba(0, 0, 0, 0.8);
+
+                        width: fit-content;
+                  }
+                  
+                  /* stuff at top of screen */
+                  #topDiv { 
+                        display: flex;
+                        justify-content: space-between;
+                        flex-wrap: wrap;
+                        height: 0px;
+                  }
+                  #uiButtons {
+                        border-spacing: 20px;
+                        width:100%;
+                  }
+
+                  /* stuff at bottom of screen */ 
+                  .bottomLi {
+                        float: left;
+                  }
+
+                  .bottomButton {
+                        border-top-left-radius: 6px;
+                        border-top-right-radius: 6px;
+                        border: 0px solid black;
+                        background-color: antiquewhite;
+                        padding-top: 4px;
+                        padding-bottom: 4px;
+                        padding-left: 8px;
+                        padding-right: 8px;
+                  }
+                  .bottomButton:hover {
+                        background-color: white;
+                  }
+
+                  #bottomDiv { 
+                        position: fixed;
+                        bottom: 0px;
+                        height: 0px;
+                        display: flex;
+                        flex-direction: column-reverse;
+                  }
+                  #bottomButtons { /* ul containing all the lower menus */
+                        list-style-type: none;
+                        margin: 0px;
+                        padding: 0px;
+                  }
+                  #particleForm {
+                        max-height: 400px;
+                        overflow-y: scroll;
+                        padding: 12px;
+                        width: fit-content;
+                  }
+            </style>
+
+      </head>
+
+      <body>
+            
+            <canvas id="gl-canvas" width="400px" height="400px"></canvas>
+            
+            <div id="topDiv">
+                  <div class="blob" style="flex-shrink: 0;">
+                        <table id="uiButtons">
+                              <tr>
+                                    <td><button id="pauseButton" type="button">Pause</button></td>
+                                    <td><label>Time step<input type="range" id="timeConst" min="1" max="10"></label></td>
+                              </tr>
+                              <tr>
+                                    <td> 
+                                          <label>&#8597 &#8596 Move
+                                                <input type="radio" id="move" name="canvasRadio">
+                                          </label>
+                                    </td>
+                                    <td>
+                                          <label>&#8634 Rotate
+                                                <input type="radio" id="rotate" name="canvasRadio">
+                                          </label>
+                                    </td>
+                              </tr>
+                              <tr>
+                                    <td><label>Velocity arrows<input type="checkbox" id="velArrows"></label></td>
+                                    <td><label>Force arrows<input type="checkbox" id="forceArrows"></label></td>
+                              </tr>
+                        </table>
+                  </div>
+                  <div style="flex-grow: 2; text-align: center; height: fit-content">
+                        <h1>Particles</h1>
+                  </div>
+            </div>
+            
+            
+            <div id="bottomDiv">
+                  <ul id="bottomButtons">
+                        <li class="bottomLi">
+                              <button type="button" class="bottomButton" i="0">Add/delete &#x1F534;</button>
+                        </li>
+      
+                        <li class="bottomLi">
+                              <button type="button" class="bottomButton" i="1">Properties &#x1F4CA;</button>
+                        </li>
+                        
+                        <li class="bottomLi">
+                              <button type="button" class="bottomButton" i="2">Forces &#x1F4A2;</button>
+                        </li>
+                        
+                        <li class="bottomLi">
+                              <button type="button" class="bottomButton" i="4">Info &#x1F4C3;</button>
+                        </li>
+
+                        <li class="bottomLi">
+                              <button type="button" class="bottomButton" i="3">Examples &#x1F310;</button>
+                        </li>
+                        
+                  </ul>
+
+                  <div id="blobContainer" style="width: fit-content;">
+                        <div id="particleForm" class="blob" style="border-top-right-radius: 0px; border-bottom-right-radius: 0px;">
+                              <button id="removeAll" type="button" style="display: block; width: 100%;">Delete all particles &#x2B06;</button>
+                              
+                              <button type="button" id="addButton" style="display: block; width: 100%;">Add all particles &#x2B07;</button>
+                              
+                              <table>
+                                    <tr>
+                                          <th></th>
+                                          <th></th>
+                                          <th>Position</th>
+                                          <th></th>
+                                          <th></th>
+                                          <th>Velocity</th>
+                                          <th></th>
+                                          <th></th>
+                                    </tr>
+                                    <tr>
+                                          <th>Type</th>
+                                          <th style="color:red">x</th>
+                                          <th style="color:green">y</th>
+                                          <th style="color:blue">z</th>
+                                          <th style="color:red">x</th>
+                                          <th style="color:green">y</th>
+                                          <th style="color:blue">z</th>
+                                          <th></th>
+                                    </tr>
+                                    <tr class="particleTr" id="firstTr">
+                                          <td>
+                                                <select>
+                                                      <option>1</option>
+                                                      <option>2</option>
+                                                      <option>3</option>
+                                                </select>
+                                          </td>
+                                          <td><input type="number" class="numberInputShort" value="0" step="any" autocomplete="off"></td>
+                                          <td><input type="number" class="numberInputShort" value="0" step="any" autocomplete="off"></td>
+                                          <td><input type="number" class="numberInputShort" value="0" step="any" autocomplete="off"></td>
+                                          <td><input type="number" class="numberInputShort" value="0" step="any" autocomplete="off"></td>
+                                          <td><input type="number" class="numberInputShort" value="0" step="any" autocomplete="off"></td>
+                                          <td><input type="number" class="numberInputShort" value="0" step="any" autocomplete="off"></td>
+                                          <td></td>
+                                    </tr>
+                              </table>
+                              <button type="button" id="newRow" style="min-width:0px">+</button>
+                        </div>
+      
+                        <div id="particleTypes" class="blob">
+                              <h3>Types of particles<br>&amp their properties</h3>
+                              <table>
+                                    <tr>
+                                          <th>Type</th>
+                                          <th></th>
+                                          <th><b style="color: orangered">mass</b></th>
+                                          <th><b style="color: dodgerblue">custom</b></th>
+                                    </tr>
+                                    <tr>
+                                          <td style="text-align: center;">1</td>
+                                          <td><input id="color0" type="color" value="#FF0000"></td>
+                                          <td><input id="m0" type="number" class="numberInputShort" value="1" step="any" autocomplete="off"></td>
+                                          <td><input id="c0" type="number" class="numberInputShort" value="1" step="any" autocomplete="off"></td>
+                                    </tr>
+                                    <tr>
+                                          <td style="text-align: center;">2</td>
+                                          <td><input id="color1" type="color" value="#00FF00"></td>
+                                          <td><input id="m1" type="number" class="numberInputShort" value="1" step="any" autocomplete="off"></td>
+                                          <td><input id="c1" type="number" class="numberInputShort" value="1" step="any" autocomplete="off"></td>
+                                    </tr>
+                                    <tr>
+                                          <td style="text-align: center;">3</td>
+                                          <td><input id="color2" type="color" value="#0000FF"></td>
+                                          <td><input id="m2" type="number" class="numberInputShort" value="1" step="any" autocomplete="off"></td>
+                                          <td><input id="c2" type="number" class="numberInputShort" value="1" step="any" autocomplete="off"></td>
+                                    </tr>
+                              </table>
+                        </div>
+      
+                        <div id="forces" class="blob">
+                              <ul style="list-style-type: none;">
+                                    <li>
+                                          <h3 style="display:inline">Force between particles = </h3>
+                                    </li>
+                                    <li>
+                                          <input id="force0" type="text" value="0" autocomplete="off" spellcheck="false">
+                                          +
+                                    </li>
+                                    <li>
+                                          <input id="force1" type="text" value="0" autocomplete="off" spellcheck="false">
+                                          +
+                                    </li>
+                                    <li>
+                                          <input id="force2" type="text" value="0" autocomplete="off" spellcheck="false">
+                                    </li>
+                              </ul>
+                              <h3 style="margin-top:4px; text-decoration: underline;">Variables</h3>
+                              <ul>
+                                    <li>
+                                          <b style="color: pink">dist_sq</b> = distance between particles, squared
+                                    </li>
+                                    <li>
+                                          <b style="color: orangered">m1</b> = <b style="color: orangered">mass</b> property of particle 1
+                                    </li>
+                                    <li>
+                                          <b style="color: orangered">m2</b> = <b style="color: orangered">mass</b> property of particle 2
+                                    </li>
+                                    <li>
+                                          <b style="color: dodgerblue">c1</b> = <b style="color: dodgerblue">custom</b> property of particle 1
+                                    </li>
+                                    <li>
+                                          <b style="color: dodgerblue">c2</b> = <b style="color: dodgerblue">custom</b> property of particle 1
+                                    </li>
+                              </ul>
+                        </div>
+      
+                        <div class="blob" style="text-align: center;">
+                              <h3 style="text-decoration: underline;">Examples</h3>
+                              <ul style="list-style-type: none; padding: 0px;">
+                                    <li>
+                                          <button exampleName="planets" class="exampleButton" type="button">Solar system</button>
+                                    </li>
+                                    <li>
+                                          <button exampleName="bounce" class="exampleButton" type="button">Bounce</button>
+                                    </li>
+                                    <li>
+                                          <button exampleName="bounce2" class="exampleButton" type="button">Bounce2</button>
+                                    </li>
+                                    <li>
+                                          <button exampleName="splash" class="exampleButton" type="button">Splash</button>
+                                    </li>
+                                    <li>
+                                          <button exampleName="threeRotations" class="exampleButton" type="button">Three rotations</button>
+                                    </li>
+                              </ul>
+                        </div>
+      
+                        <div class="blob">
+                              <h3 style="text-decoration: underline;">Info</h3>
+                              <ul>
+                                    <li>Force equations are calculated between every pair of particles. A positive result is attraction, negative is repulsion.</li>
+                                    <li>Particles with higher mass are pushed less by forces.</li>
+                                    <li>When particles collide, any equation involving 1 / <b style="color: pink">dist_sq</b> will become really big so they'll fly everywhere.</li>
+                                    <br>
+                                    <li>Pause to edit force equations.</li>
+                                    <li>Higher time steps result in more unpredictable behavior.</li>
+                                    <br>
+                                    <li>Mouse wheel moves camera forward / back.</li>
+                                    <li>Hold shift to temporarily switch between moving and rotating on click.</li>
+                              </ul>
+                        </div>
+                  </div>
+                  
+            </div>
+      </body>
+</html>
