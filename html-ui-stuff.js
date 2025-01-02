@@ -257,7 +257,19 @@ function newRow() {
 
 // =====================================================================================
 
+function keyPressedDown(event) {
+    if (event.key == "Shift" && event.repeat == false) {
+        if (document.getElementById("rotate").checked) document.getElementById("move").click();
+        else document.getElementById("rotate").click();
+    }
+}
 
+function keyUnpressed(event) {
+    if (event.key == "Shift") {
+        if (document.getElementById("rotate").checked) document.getElementById("move").click();
+        else document.getElementById("rotate").click();
+    }
+}
 
 
 // MOUSE STUFF =======================================================
@@ -272,8 +284,6 @@ function onMouseMove(event) {
         //get proper action based on radio inputs on canvas
 
     let rotating = document.getElementById("rotate").checked;
-    if (rotating != event.shiftKey) rotating = true;
-    else rotating = false;
     
     moveCameraClick(event.movementX, event.movementY, rotating);
     //}
@@ -386,6 +396,9 @@ export function setupHTMLUIstuff() {
     for (let exampleButton of document.getElementsByClassName("exampleButton")) {
         exampleButton.addEventListener("click", () => loadPreset(getPreset(exampleButton.getAttribute("exampleName"))));
     }
+
+    addEventListener("keydown", keyPressedDown);
+    addEventListener("keyup", keyUnpressed);
 
     setupInputValidListeners();
 }
