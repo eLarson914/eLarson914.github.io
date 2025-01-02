@@ -2,14 +2,13 @@
 import { physicsStep } from "./physics.js";
 
 import { 
-	setupUIstuff,
-	enableOrDisableForceInput,
+	setupHTMLUIstuff,
 	loadPreset,
 	getTypeColor,
 	getTypeMass,
 	getTypeCustom,
 	getForceFuncs,
-	getTimeConst
+	getTimeConst,
  } from "./html-ui-stuff.js";
 
 import {
@@ -42,9 +41,7 @@ function main() {
 	setupRenderStuff();
 
 	//set up mouse and html input stuff
-	setupUIstuff();
-
-	enableOrDisableForceInput(false);
+	setupHTMLUIstuff();
 
 	loadPreset(presets.threeRotations);
 
@@ -64,15 +61,12 @@ function animateScene() {
 	let drawVelArrows = document.getElementById("velArrows").checked;
 	let drawForceArrows = document.getElementById("forceArrows").checked;
 
-	if (paused || particles.length == 0) enableOrDisableForceInput(true);
-	else enableOrDisableForceInput(false);
-
 	//physics
 	if (!paused && particles.length > 0) {
 		let forceFuncs = getForceFuncs();
-		physicsStep(particles, forceFuncs, getTimeConst(), drawVelArrows, drawForceArrows); //inplace
+		physicsStep(particles, forceFuncs, getTimeConst(), drawVelArrows, drawForceArrows); //particles array modified in place
 	}
-	else if (drawVelArrows) {
+	else if (drawVelArrows) { //even while paused, draw velocity arrows
 		for (let particle of particles) queueArrowDraw(particle.pos, particle.vel, [0, 1, 0, 1]);
 	}
 
@@ -105,15 +99,12 @@ export function forceFuncValid(forceFunc) {
 	}
 }
 
-export function pauseToggle(event) {
-    if (!paused) {
-        paused = true;
-        event.target.innerHTML = "Unpause";
-    }
-    else {
-        paused = false;
-        event.target.innerHTML = "Pause";
-    }
+export function setPaused(isPaused) {
+	paused = isPaused;
+}
+
+export function isPaused() {
+	return paused;
 }
 
 export function moveCameraClick(deltaX, deltaY, rotating) {

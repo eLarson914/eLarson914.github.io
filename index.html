@@ -14,6 +14,7 @@
                   body {
                         margin: 0px;
                         height: 0px;
+                        background-color: black;
                   }
                   canvas {
                         position: fixed;
@@ -62,11 +63,8 @@
                   }
                   /* ---------------------------------- */
 
-                  .numberInputShort {
+                  .numberInput {
                         width: 50px;
-                  }
-                  .numberInputLong {
-                        width: 80px;
                   }
                   
                   /* rounded menus */
@@ -106,6 +104,7 @@
                         padding-bottom: 4px;
                         padding-left: 8px;
                         padding-right: 8px;
+                        height: 27px;
                   }
                   .bottomButton:hover {
                         background-color: white;
@@ -183,13 +182,12 @@
                         </li>
                         
                         <li class="bottomLi">
-                              <button type="button" class="bottomButton" i="4">Info &#x1F4C3;</button>
+                              <button type="button" class="bottomButton" i="4">Info &#x2139;</button>
                         </li>
 
                         <li class="bottomLi">
                               <button type="button" class="bottomButton" i="3">Examples &#x1F310;</button>
                         </li>
-                        
                   </ul>
 
                   <div id="blobContainer" style="width: fit-content;">
@@ -227,12 +225,12 @@
                                                       <option>3</option>
                                                 </select>
                                           </td>
-                                          <td><input type="number" class="numberInputShort" value="0" step="any" autocomplete="off"></td>
-                                          <td><input type="number" class="numberInputShort" value="0" step="any" autocomplete="off"></td>
-                                          <td><input type="number" class="numberInputShort" value="0" step="any" autocomplete="off"></td>
-                                          <td><input type="number" class="numberInputShort" value="0" step="any" autocomplete="off"></td>
-                                          <td><input type="number" class="numberInputShort" value="0" step="any" autocomplete="off"></td>
-                                          <td><input type="number" class="numberInputShort" value="0" step="any" autocomplete="off"></td>
+                                          <td><input type="number" class="numberInput xyzInput" value="0" step="any" autocomplete="off"></td>
+                                          <td><input type="number" class="numberInput xyzInput" value="0" step="any" autocomplete="off"></td>
+                                          <td><input type="number" class="numberInput xyzInput" value="0" step="any" autocomplete="off"></td>
+                                          <td><input type="number" class="numberInput xyzInput" value="0" step="any" autocomplete="off"></td>
+                                          <td><input type="number" class="numberInput xyzInput" value="0" step="any" autocomplete="off"></td>
+                                          <td><input type="number" class="numberInput xyzInput" value="0" step="any" autocomplete="off"></td>
                                           <td></td>
                                     </tr>
                               </table>
@@ -251,20 +249,20 @@
                                     <tr>
                                           <td style="text-align: center;">1</td>
                                           <td><input id="color0" type="color" value="#FF0000"></td>
-                                          <td><input id="m0" type="number" class="numberInputShort" value="1" step="any" autocomplete="off"></td>
-                                          <td><input id="c0" type="number" class="numberInputShort" value="1" step="any" autocomplete="off"></td>
+                                          <td><input id="m0" type="number" class="numberInput massInput" value="1" step="any" autocomplete="off"></td>
+                                          <td><input id="c0" type="number" class="numberInput customInput" value="1" step="any" autocomplete="off"></td>
                                     </tr>
                                     <tr>
                                           <td style="text-align: center;">2</td>
                                           <td><input id="color1" type="color" value="#00FF00"></td>
-                                          <td><input id="m1" type="number" class="numberInputShort" value="1" step="any" autocomplete="off"></td>
-                                          <td><input id="c1" type="number" class="numberInputShort" value="1" step="any" autocomplete="off"></td>
+                                          <td><input id="m1" type="number" class="numberInput massInput" value="1" step="any" autocomplete="off"></td>
+                                          <td><input id="c1" type="number" class="numberInput customInput" value="1" step="any" autocomplete="off"></td>
                                     </tr>
                                     <tr>
                                           <td style="text-align: center;">3</td>
                                           <td><input id="color2" type="color" value="#0000FF"></td>
-                                          <td><input id="m2" type="number" class="numberInputShort" value="1" step="any" autocomplete="off"></td>
-                                          <td><input id="c2" type="number" class="numberInputShort" value="1" step="any" autocomplete="off"></td>
+                                          <td><input id="m2" type="number" class="numberInput massInput" value="1" step="any" autocomplete="off"></td>
+                                          <td><input id="c2" type="number" class="numberInput customInput" value="1" step="any" autocomplete="off"></td>
                                     </tr>
                               </table>
                         </div>
@@ -275,15 +273,15 @@
                                           <h3 style="display:inline">Force between particles = </h3>
                                     </li>
                                     <li>
-                                          <input id="force0" type="text" value="0" autocomplete="off" spellcheck="false">
+                                          <input id="force0" type="text" value="0" autocomplete="off" spellcheck="false" class="enableOnPause" disabled>
                                           +
                                     </li>
                                     <li>
-                                          <input id="force1" type="text" value="0" autocomplete="off" spellcheck="false">
+                                          <input id="force1" type="text" value="0" autocomplete="off" spellcheck="false" class="enableOnPause" disabled>
                                           +
                                     </li>
                                     <li>
-                                          <input id="force2" type="text" value="0" autocomplete="off" spellcheck="false">
+                                          <input id="force2" type="text" value="0" autocomplete="off" spellcheck="false" class="enableOnPause" disabled>
                                     </li>
                               </ul>
                               <h3 style="margin-top:4px; text-decoration: underline;">Variables</h3>
@@ -331,10 +329,11 @@
                               <h3 style="text-decoration: underline;">Info</h3>
                               <ul>
                                     <li>Force equations are calculated between every pair of particles. A positive result is attraction, negative is repulsion.</li>
-                                    <li>Particles with higher mass are pushed less by forces.</li>
-                                    <li>When particles collide, any equation involving 1 / <b style="color: pink">dist_sq</b> will become really big so they'll fly everywhere.</li>
+                                    <li>Particles with higher mass are pushed less by forces (a = f / m).</li>
+                                    <li>When particles collide, any equation involving "1 / <b style="color: pink">dist_sq</b>" will become really big so they'll fly everywhere.</li>
                                     <br>
-                                    <li>Pause to edit force equations.</li>
+                                    <li>Pause to edit force equations. Common functions like "sin(m1)" or "pi * c1^2" will work.</li>
+                                    <br>
                                     <li>Higher time steps result in more unpredictable behavior.</li>
                                     <br>
                                     <li>Mouse wheel moves camera forward / back.</li>

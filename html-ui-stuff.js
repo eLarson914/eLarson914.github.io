@@ -5,11 +5,10 @@ import {
     moveCameraClick,
     moveCameraScroll,
     getPreset,
-    pauseToggle,
-    isNumber
+    isPaused,
+    isNumber,
+    setPaused
 } from "./apricot.js";
-
-import * as vec3 from './gl-matrix/vec3.js';
 
 let forceInputs = [
     document.getElementById("force0"),
@@ -42,11 +41,168 @@ let mouseMoveState = 0;
 
 let canvas = document.getElementById("gl-canvas");
 
-export function enableOrDisableForceInput(enable) {
+export function getTypeColor(type) {
+    return colorInputs[type].value;
+}
+
+export function getTypeMass(type) {
+    return mInputs[type].value;
+}
+
+export function getTypeCustom(type) {
+    return cInputs[type].value;
+}
+
+export function getForceFuncs() {
+	let forceFuncs = [];
 	for (let forceInput of forceInputs) {
-		forceInput.disabled = !enable;
+        forceFuncs.push(forceInput.value);
+	}
+	return forceFuncs;
+}
+
+//between 0.01 and 0.1
+export function getTimeConst() {
+	return document.getElementById("timeConst").value / 100;
+}
+
+
+
+
+
+
+// MAKE SURE INPUTS ARE VALID AT ALL TIMES =============================================
+// AT ALL TIMES WHILE PLAYING, AND AFTER INPUT CHANGE:
+// MASS PROPERTY CANNOT BE ZERO
+// CUSTOM PROPERTY CANNOT BE EMPTY
+// FORCE EQUATION MUST BE VALID
+
+// AFTER INPUT CHANGE:
+// THE ADD / DELETE FORM'S POS XYZ / VEL XYZ FIELDS MUST NOT BE EMPTY
+
+function massNotZeroWhenPlaying(event) {
+    if (!isPaused()) { //if not paused
+        if (!isNumber(event.target.value) || event.target.value <= 0) {
+            event.target.value = 0.01;
+        }
+    }
+}
+function massNotZeroAfterChange(event) {
+    if (!isNumber(event.target.value) || event.target.value <= 0) {
+        event.target.value = 0.01;
+    }
+}
+
+function customNotEmptyWhenPlaying(event) {
+    if (!isPaused()) { //if not paused
+        if (!isNumber(event.target.value)) {
+            event.target.value = 0;
+        }
+    }
+}
+function numberInputNotEmptyAfterChange(event) {
+    if (!isNumber(event.target.value)) {
+        event.target.value = 0;
+    }
+}
+
+function forceValidAfterChange(event) {
+    if (!forceFuncValid(event.target.value)) {
+        event.target.value = 0;
+    }
+}
+
+function enableDisableForceEquations(paused) {
+    for (let forceInput of forceInputs) {
+        if (paused) forceInput.disabled = false;
+        if (!paused) forceInput.disabled = true;
+    }
+}
+
+function setupInputValidListeners() {
+    // MASS
+    for (let massInput of document.getElementsByClassName("massInput")) {
+        massInput.addEventListener("input", massNotZeroWhenPlaying); //CANNOT BE ZERO WHILE PLAYING
+        massInput.addEventListener("change", massNotZeroAfterChange); //CANNOT BE ZERO AFTER CHANGED
+    }
+
+    // CUSTOM
+    for (let customInputinput of document.getElementsByClassName("customInput")) {
+        customInputinput.addEventListener("input", customNotEmptyWhenPlaying); //CANNOT BE EMPTY WHILE PLAYING
+        customInputinput.addEventListener("change", numberInputNotEmptyAfterChange); //CANNOT BE EMPTY AFTER CHANGED
+    }
+
+    // FORCE EQUATION
+    for (let forceInput of forceInputs) {
+        //IS DISABLED ON PLAY SO DON'T HAVE TO WORRY EVERY FRAME
+        forceInput.addEventListener("change", forceValidAfterChange);
+    }
+
+    //ADD / DELETE POS / VEL XYZ
+    for (let xyzInput of document.getElementsByClassName("xyzInput")) {
+        xyzInput.addEventListener("change", numberInputNotEmptyAfterChange);
+    }
+}
+
+// ======================================================================================
+
+
+
+
+//pause button hit
+function pauseToggle(event) {
+    let newPausedState = !isPaused();
+    setPaused(newPausedState);
+    if (!newPausedState) { //if not paused anymore
+        event.target.innerHTML = "Pause";
+    }
+    else { //if paused now
+        event.target.innerHTML = "Play";
+    }
+    enableDisableForceEquations(newPausedState);
+}
+
+
+//load data and create particles for example i.e. Solar System
+export function loadPreset(preset) {
+	deleteParticlesAll();
+
+	document.getElementById("m0").value = preset.m0;
+	document.getElementById("c0").value = preset.c0;
+	document.getElementById("m1").value = preset.m1;
+	document.getElementById("c1").value = preset.c1;
+	document.getElementById("m2").value = preset.m2;
+	document.getElementById("c2").value = preset.c2;
+
+	document.getElementById("force0").value = preset.force0;
+	document.getElementById("force1").value = preset.force1;
+	document.getElementById("force2").value = preset.force2;
+
+	for (let typeposvel of preset.particles) {
+		createParticle(typeposvel[0], typeposvel[1], typeposvel[2]);
 	}
 }
+
+
+//when bottom button is pressed, open "Add/delete" or "Properties" or "Forces" menu etc.
+function showMenu(event) {
+    let i = event.target.getAttribute("i");
+
+    for (let j = 0; j < document.getElementById("blobContainer").children.length; j++) {
+        let menu = document.getElementById("blobContainer").children[j];
+        if (i == j) {
+            if (menu.style.display == "none") menu.style.display = "block";
+            else menu.style.display = "none";
+        }
+        else menu.style.display = "none";
+    }
+}
+
+
+
+
+
+//ADD / DELETE MENU =======================================================================
 
 function addParticlesFromInput() {
     for (let tr of document.getElementsByClassName("particleTr")) {
@@ -81,70 +237,14 @@ function addParticlesFromInput() {
     }
 }
 
-export function getTypeColor(type) {
-    return colorInputs[type].value;
-}
-
-export function getTypeMass(type) {
-    return mInputs[type].value;
-}
-
-export function getTypeCustom(type) {
-    return cInputs[type].value;
-}
-
-export function getForceFuncs() {
-	let forceFuncs = [];
-	for (let forceInput of forceInputs) {
-		if (forceFuncValid(forceInput.value)) {
-			forceFuncs.push(forceInput.value);
-		}
-		else {
-			forceInput.value = 0;
-		}
-	}
-	return forceFuncs;
-}
-
-//between 0.01 and 0.1
-export function getTimeConst() {
-	return document.getElementById("timeConst").value / 100;
-}
-
-
-function checkInputZero(event) {
-	if (event.target.value == 0) {
-		event.target.value = 0.001;
-	}
-}
-
-export function loadPreset(preset) {
-	deleteParticlesAll();
-
-	document.getElementById("m0").value = preset.m0;
-	document.getElementById("c0").value = preset.c0;
-	document.getElementById("m1").value = preset.m1;
-	document.getElementById("c1").value = preset.c1;
-	document.getElementById("m2").value = preset.m2;
-	document.getElementById("c2").value = preset.c2;
-
-	document.getElementById("force0").value = preset.force0;
-	document.getElementById("force1").value = preset.force1;
-	document.getElementById("force2").value = preset.force2;
-
-	for (let typeposvel of preset.particles) {
-		createParticle(typeposvel[0], typeposvel[1], typeposvel[2]);
-	}
-}
-
-
-
+//adds new row to Add/delete menu
 function newRow() {
     let rowClone = document.getElementById("firstTr").cloneNode(true);
     document.getElementById("firstTr").parentElement.appendChild(rowClone);
 
     for (let i = 0; i < 6; i++) {
         rowClone.children[i + 1].children[0].value = 0;
+        rowClone.children[i + 1].children[0].addEventListener("change", numberInputNotEmptyAfterChange);
     }
 
     let button = document.createElement("button");
@@ -155,21 +255,12 @@ function newRow() {
     rowClone.children[rowClone.children.length - 1].appendChild(button);
 }
 
-function showMenu(event) {
-    let i = event.target.getAttribute("i");
-
-    for (let j = 0; j < document.getElementById("blobContainer").children.length; j++) {
-        let menu = document.getElementById("blobContainer").children[j];
-        if (i == j) {
-            if (menu.style.display == "none") menu.style.display = "block";
-            else menu.style.display = "none";
-        }
-        else menu.style.display = "none";
-    }
-}
+// =====================================================================================
 
 
-// MOUSE STUFF -----------------------------------------------------
+
+
+// MOUSE STUFF =======================================================
 
 function onMouseMove(event) {
     if (mouseMoveState == 0) {
@@ -217,9 +308,16 @@ function onTouchEnd(event) {
     touchLast = null;
 }
 
-// ---------------------------------------------------------
+// ==========================================================================
 
-export function setupUIstuff() {
+
+
+
+
+
+
+export function setupHTMLUIstuff() {
+    //mouse click starts camera move
 	canvas.addEventListener(
 		"mousedown", (event) => {
 			if (event.button == 0) {
@@ -238,16 +336,16 @@ export function setupUIstuff() {
 			event.preventDefault();
 			
 	});
-	canvas.addEventListener("mousemove", onMouseMove);
-	canvas.addEventListener("touchmove", onTouchMove);
-	canvas.addEventListener("touchstart", onTouchStart);
-	canvas.addEventListener("touchend", onTouchEnd);
-	document.addEventListener(
+	canvas.addEventListener("mousemove", onMouseMove); //mouse move
+	canvas.addEventListener("touchmove", onTouchMove); //mobile touch move
+	canvas.addEventListener("touchstart", onTouchStart); //mobile touch start
+	canvas.addEventListener("touchend", onTouchEnd); //mobile touch end
+	document.addEventListener( //mouse up ends camera move
 		"mouseup", () => {
 			mouseMoveState = 0; //not moving camera
 		}
 	);
-	canvas.addEventListener("wheel", (event) => {
+	canvas.addEventListener("wheel", (event) => { //mouse wheel moves camera forward
 		let amt = 1;
 		if (event.deltaY < 0) {
 			amt = -1;
@@ -257,14 +355,19 @@ export function setupUIstuff() {
 		event.preventDefault();
 	});
 
+    //pause button
 	document.getElementById("pauseButton").addEventListener("click", pauseToggle);
 
+    //remove all particles button
 	document.getElementById("removeAll").addEventListener("click", deleteParticlesAll);
 
+    //add particles from form button
 	document.getElementById("addButton").addEventListener("click", addParticlesFromInput);
 
+    //new row for add particles form
 	document.getElementById("newRow").addEventListener("click", newRow);
 
+    //buttons at bottom tab for opening menus
     for (let bottomButton of document.getElementsByClassName("bottomButton")) {
         let i = bottomButton.getAttribute("i");
         let menu = document.getElementById("blobContainer").children[i];
@@ -273,15 +376,16 @@ export function setupUIstuff() {
         bottomButton.addEventListener("click", showMenu);
     }
 
-	document.getElementById("m0").addEventListener("input", checkInputZero);
-	document.getElementById("m1").addEventListener("input", checkInputZero);
-	document.getElementById("m2").addEventListener("input", checkInputZero);
-	
+    //radio for what happens when you drag mouse on screen
+	document.getElementById("move").checked = true; 
 
-	document.getElementById("move").checked = true; //radio for what happens when you drag mouse on screen
+    //time constant slider
 	document.getElementById("timeConst").value = "2";
 
+    //button to load example scenario
     for (let exampleButton of document.getElementsByClassName("exampleButton")) {
         exampleButton.addEventListener("click", () => loadPreset(getPreset(exampleButton.getAttribute("exampleName"))));
     }
+
+    setupInputValidListeners();
 }
