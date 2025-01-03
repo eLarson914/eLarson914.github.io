@@ -28,11 +28,13 @@
                   }
                   
                   input[type="text"] { width: 200px; }
-                  input[type="number"] {width: 50px; }
                   button {
                         min-width: 80px;
                         border-radius: 5px;
                         background-color: antiquewhite;
+                  }
+                  button:hover {
+                        background-color: white;
                   }
                   
                   /* FONT ------------------------------- */
@@ -65,6 +67,12 @@
 
                   .numberInput {
                         width: 50px;
+
+                  }
+                  @media screen and (max-width: 600px) {
+                        .numberInput {
+                              width: 25px;
+                        }
                   }
                   
                   /* rounded menus */
@@ -84,22 +92,46 @@
                         justify-content: space-between;
                         flex-wrap: wrap;
                         height: 0px;
+                        width: 100%;
+                        position: fixed;
                   }
                   #uiButtonsTable {
                         border-spacing: 20px;
                         width:100%;
                         text-align: center;
                   }
+                  @media screen and (max-width: 600px) {
+                        #uiButtonsTable {
+                              border-spacing: 0px;
+                        }
+                  }
                   #pauseButton {
                         height: 60px;
                         font-size: 24px;
                   }
-
-                  /* stuff at bottom of screen */ 
-                  .bottomLi {
-                        float: left;
+                  #particlesHeaderDiv {
+                        flex-grow: 2;
+                        text-align: center;
+                        height: fit-content;
+                  }
+                  @media screen and (max-width: 600px) {
+                        #particlesHeaderDiv {
+                              display: none;
+                        }
                   }
 
+                  /* stuff at bottom of screen */ 
+                  #bottomDiv { 
+                        position: fixed;
+                        bottom: 0px;
+                        height: 0px;
+                        display: flex;
+                        flex-direction: column-reverse;
+                  }
+                  #bottomButtons { /* div containing all the lower menus */
+                        display: flex;
+                        flex-wrap: wrap-reverse;
+                  }
                   .bottomButton {
                         border-top-left-radius: 6px;
                         border-top-right-radius: 6px;
@@ -111,22 +143,7 @@
                         padding-right: 8px;
                         height: 27px;
                   }
-                  .bottomButton:hover {
-                        background-color: white;
-                  }
 
-                  #bottomDiv { 
-                        position: fixed;
-                        bottom: 0px;
-                        height: 0px;
-                        display: flex;
-                        flex-direction: column-reverse;
-                  }
-                  #bottomButtons { /* ul containing all the lower menus */
-                        list-style-type: none;
-                        margin: 0px;
-                        padding: 0px;
-                  }
                   #particleForm {
                         max-height: 400px;
                         overflow-y: scroll;
@@ -135,65 +152,56 @@
                   }
             </style>
 
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+
       </head>
 
       <body>
             
             <canvas id="gl-canvas" width="400px" height="400px"></canvas>
             
-            <div id="topDiv">
-                  <div class="blob" style="flex-shrink: 0;">
-                        <table id="uiButtonsTable">
-                              <tr>
-                                    <td><button id="pauseButton" type="button">&#x23F8;</button></td>
-                                    <td><label>Time step<br><input type="range" id="timeConst" min="1" max="10"></label></td>
-                              </tr>
-                              <tr>
-                                    <td>
-                                          <label>&#8597 &#8596 Move
-                                                <input type="radio" id="move" name="canvasRadio">
-                                          </label>
-                                    </td>
-                                    <td>
-                                          <label>&#8634 Rotate
-                                                <input type="radio" id="rotate" name="canvasRadio">
-                                          </label>
-                                    </td>
-                              </tr>
-                              <tr>
-                                    <td><label>Velocity arrows<input type="checkbox" id="velArrows"></label></td>
-                                    <td><label>Force arrows<input type="checkbox" id="forceArrows"></label></td>
-                              </tr>
-                        </table>
+            <!--<div style="position: fixed">-->
+                  <div id="topDiv">
+                        <div class="blob" style="flex-shrink: 0;">
+                              <table id="uiButtonsTable">
+                                    <tr>
+                                          <td><button id="pauseButton" type="button">&#x23F8;</button></td>
+                                          <td><label>Time step<br><input type="range" id="timeConst" min="1" max="10"></label></td>
+                                    </tr>
+                                    <tr>
+                                          <td>
+                                                <label>&#8597 &#8596 Move
+                                                      <input type="radio" id="move" name="canvasRadio">
+                                                </label>
+                                          </td>
+                                          <td>
+                                                <label>&#8634 Rotate
+                                                      <input type="radio" id="rotate" name="canvasRadio">
+                                                </label>
+                                          </td>
+                                    </tr>
+                                    <tr>
+                                          <td><label>Velocity arrows<input type="checkbox" id="velArrows"></label></td>
+                                          <td><label>Force arrows<input type="checkbox" id="forceArrows"></label></td>
+                                    </tr>
+                              </table>
+                        </div>
+                        <div id="particlesHeaderDiv">
+                              <h1>Particles</h1>
+                        </div>
                   </div>
-                  <div style="flex-grow: 2; text-align: center; height: fit-content">
-                        <h1>Particles</h1>
-                  </div>
-            </div>
+            <!--</div>-->
+            
             
             
             <div id="bottomDiv">
-                  <ul id="bottomButtons">
-                        <li class="bottomLi">
-                              <button type="button" class="bottomButton" i="0">Add/delete &#x1F534;</button>
-                        </li>
-      
-                        <li class="bottomLi">
-                              <button type="button" class="bottomButton" i="1">Properties &#x1F4CA;</button>
-                        </li>
-                        
-                        <li class="bottomLi">
-                              <button type="button" class="bottomButton" i="2">Forces &#x1F4A2;</button>
-                        </li>
-                        
-                        <li class="bottomLi">
-                              <button type="button" class="bottomButton" i="4">Info &#x2139;</button>
-                        </li>
-
-                        <li class="bottomLi">
-                              <button type="button" class="bottomButton" i="3">Examples &#x1F310;</button>
-                        </li>
-                  </ul>
+                  <div id="bottomButtons">
+                        <button type="button" class="bottomButton" i="0">Add/delete &#x1F534;</button>
+                        <button type="button" class="bottomButton" i="1">Properties &#x1F4CA;</button>
+                        <button type="button" class="bottomButton" i="2">Forces &#x1F4A2;</button>
+                        <button type="button" class="bottomButton" i="4">Info &#x2139;</button>
+                        <button type="button" class="bottomButton" i="3">Examples &#x1F310;</button>
+                  </div>
 
                   <div id="blobContainer" style="width: fit-content;">
                         <div id="particleForm" class="blob" style="border-top-right-radius: 0px; border-bottom-right-radius: 0px;">
@@ -205,18 +213,22 @@
                                     <tr>
                                           <th></th>
                                           <th></th>
-                                          <th>Position</th>
+                                          <th></th>
+                                          <th style="max-width: 0px;">Position</th>
                                           <th></th>
                                           <th></th>
-                                          <th>Velocity</th>
+                                          <th></th>
+                                          <th style="max-width: 0px;">Velocity</th>
                                           <th></th>
                                           <th></th>
                                     </tr>
                                     <tr>
                                           <th>Type</th>
-                                          <th style="color:red">x</th>
-                                          <th style="color:green">y</th>
-                                          <th style="color:blue">z</th>
+                                          <th></th>
+                                          <th style="color:red;">x</th>
+                                          <th style="color:green;">y</th>
+                                          <th style="color:blue;">z</th>
+                                          <th></th>
                                           <th style="color:red">x</th>
                                           <th style="color:green">y</th>
                                           <th style="color:blue">z</th>
@@ -230,9 +242,11 @@
                                                       <option>3</option>
                                                 </select>
                                           </td>
+                                          <td>|</td>
                                           <td><input type="number" class="numberInput xyzInput" value="0" step="any" autocomplete="off"></td>
                                           <td><input type="number" class="numberInput xyzInput" value="0" step="any" autocomplete="off"></td>
                                           <td><input type="number" class="numberInput xyzInput" value="0" step="any" autocomplete="off"></td>
+                                          <td>|</td>
                                           <td><input type="number" class="numberInput xyzInput" value="0" step="any" autocomplete="off"></td>
                                           <td><input type="number" class="numberInput xyzInput" value="0" step="any" autocomplete="off"></td>
                                           <td><input type="number" class="numberInput xyzInput" value="0" step="any" autocomplete="off"></td>
@@ -253,19 +267,19 @@
                                     </tr>
                                     <tr>
                                           <td style="text-align: center;">1</td>
-                                          <td><input id="color0" type="color" value="#FF0000"></td>
+                                          <td><input id="color0" type="color" value="#999900"></td>
                                           <td><input id="m0" type="number" class="numberInput massInput" value="1" step="any" autocomplete="off"></td>
                                           <td><input id="c0" type="number" class="numberInput customInput" value="1" step="any" autocomplete="off"></td>
                                     </tr>
                                     <tr>
                                           <td style="text-align: center;">2</td>
-                                          <td><input id="color1" type="color" value="#00FF00"></td>
+                                          <td><input id="color1" type="color" value="#009999"></td>
                                           <td><input id="m1" type="number" class="numberInput massInput" value="1" step="any" autocomplete="off"></td>
                                           <td><input id="c1" type="number" class="numberInput customInput" value="1" step="any" autocomplete="off"></td>
                                     </tr>
                                     <tr>
                                           <td style="text-align: center;">3</td>
-                                          <td><input id="color2" type="color" value="#0000FF"></td>
+                                          <td><input id="color2" type="color" value="#990099"></td>
                                           <td><input id="m2" type="number" class="numberInput massInput" value="1" step="any" autocomplete="off"></td>
                                           <td><input id="c2" type="number" class="numberInput customInput" value="1" step="any" autocomplete="off"></td>
                                     </tr>

@@ -210,14 +210,14 @@ function addParticlesFromInput() {
     for (let tr of document.getElementsByClassName("particleTr")) {
         let type = Number(tr.children[0].children[0].value) - 1;
         let pos = [
-            tr.children[1].children[0].value,
             tr.children[2].children[0].value,
-            tr.children[3].children[0].value
+            tr.children[3].children[0].value,
+            tr.children[4].children[0].value
         ];
         let vel = [
-            tr.children[4].children[0].value,
-            tr.children[5].children[0].value,
-            tr.children[6].children[0].value
+            tr.children[6].children[0].value,
+            tr.children[7].children[0].value,
+            tr.children[8].children[0].value
         ];
 
         let valid = true;
@@ -243,10 +243,10 @@ function addParticlesFromInput() {
 function newRow() {
     let rowClone = document.getElementById("firstTr").cloneNode(true);
     document.getElementById("firstTr").parentElement.appendChild(rowClone);
-
-    for (let i = 0; i < 6; i++) {
-        rowClone.children[i + 1].children[0].value = 0;
-        rowClone.children[i + 1].children[0].addEventListener("change", numberInputNotEmptyAfterChange);
+    let numberInputIndeces = [2, 3, 4, 6, 7, 8];
+    for (let i of numberInputIndeces) {
+        rowClone.children[i].children[0].value = 0;
+        rowClone.children[i].children[0].addEventListener("change", numberInputNotEmptyAfterChange);
     }
 
     let button = document.createElement("button");
