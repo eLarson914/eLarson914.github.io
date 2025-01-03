@@ -144,11 +144,11 @@ function drawAxisArrows() {
 	}
 }
 
-export function queueArrowDraw(pos, direction, color) {
-	arrowsToDraw.push([pos, direction, color]);
+export function queueArrowDraw(pos, displacement, color) {
+	arrowsToDraw.push([pos, displacement, color]);
 }
 
-function drawArrow(pos, direction, uColor = [1, 1, 1, 1]) {
+function drawArrow(pos, displacement, uColor = [1, 1, 1, 1]) {
 	gl.useProgram(arrowShaderProgram);
 	setupVertexPosAttribute(arrowShaderProgram, arrowBuffer, 3);
 
@@ -156,11 +156,24 @@ function drawArrow(pos, direction, uColor = [1, 1, 1, 1]) {
 	let uMatrix = mat4.create();
 	mat4.translate(uMatrix, uMatrix, pos);
 
-	let rotationAxis = vec3.create(); vec3.cross(rotationAxis, [0, 1, 0], direction);
-	let angle = vec3.angle([0, 1, 0], direction);
+	
+
+	let rotationAxis = vec3.create(); //axis to rotate the arrow around to point it the right way
+	
+	//by default, the arrow is pointing up at +y as defined in its vertices [0, 1, 0]
+	//if the displacement is also purely along the y-axis, just pick an arbitrary axis to rotate it by
+	if (displacement[0] == 0 && displacement[2] == 0) {
+		rotationAxis = vec3.fromValues(1, 0, 0);
+	}
+	else { //else find out the proper rotationAxis by cross product
+		vec3.cross(rotationAxis, [0, 1, 0], displacement);
+	}
+
+	let angle = vec3.angle([0, 1, 0], displacement);
 	mat4.rotate(uMatrix, uMatrix, angle, rotationAxis);
 
-	let scale = vec3.length(direction);
+	//scale to the proper length
+	let scale = vec3.length(displacement);
 	mat4.scale(uMatrix, uMatrix, [scale, scale, scale]);
 
 	mat4.multiply(uMatrix, viewMat, uMatrix);
