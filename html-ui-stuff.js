@@ -154,10 +154,12 @@ function pauseToggle(event) {
     let newPausedState = !isPaused();
     setPaused(newPausedState);
     if (!newPausedState) { //if not paused anymore
-        event.target.innerHTML = "Pause";
+        event.target.innerHTML = "&#x23F8;";
+        document.getElementById("forcePauseSpan").innerHTML = "(pause to edit)";
     }
     else { //if paused now
-        event.target.innerHTML = "Play";
+        event.target.innerHTML = "&#x23F5;";
+        document.getElementById("forcePauseSpan").innerHTML = "";
     }
     enableDisableForceEquations(newPausedState);
 }

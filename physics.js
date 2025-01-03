@@ -26,7 +26,10 @@ function physicsStep(particlesArray, forceFuncs, timeConst, drawVelArrows, drawF
                 vec3.add(forceSum, forceSum, force);
             }
 
-            if (drawForceArrows && vec3.squaredLength(forceSum) > 0.001) queueArrowDraw(particle1.pos, vec3copy(forceSum), [1, 0, 0, 1]);
+            if (drawForceArrows) {
+                queueArrowDraw(particle1.pos, [forceSum[0]*1, forceSum[1]*1, forceSum[2]*1], [1, 1, 1, 1]);
+                queueArrowDraw(particle2.pos, [forceSum[0]*-1, forceSum[1]*-1, forceSum[2]*-1], [1, 1, 1, 1]);
+            }
             
             //update both particles's velocities from force between them
             let forceSumNeg = vec3.create(); vec3.scale(forceSumNeg, forceSum, -1);

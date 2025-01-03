@@ -161,7 +161,7 @@ function drawArrow(pos, direction, uColor = [1, 1, 1, 1]) {
 	mat4.rotate(uMatrix, uMatrix, angle, rotationAxis);
 
 	let scale = vec3.length(direction);
-	mat4.scale(uMatrix, uMatrix, [1, scale, 1]);
+	mat4.scale(uMatrix, uMatrix, [scale, scale, scale]);
 
 	mat4.multiply(uMatrix, viewMat, uMatrix);
 

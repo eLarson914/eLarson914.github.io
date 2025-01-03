@@ -85,9 +85,14 @@
                         flex-wrap: wrap;
                         height: 0px;
                   }
-                  #uiButtons {
+                  #uiButtonsTable {
                         border-spacing: 20px;
                         width:100%;
+                        text-align: center;
+                  }
+                  #pauseButton {
+                        height: 60px;
+                        font-size: 24px;
                   }
 
                   /* stuff at bottom of screen */ 
@@ -138,10 +143,10 @@
             
             <div id="topDiv">
                   <div class="blob" style="flex-shrink: 0;">
-                        <table id="uiButtons">
+                        <table id="uiButtonsTable">
                               <tr>
-                                    <td><button id="pauseButton" type="button">Pause</button></td>
-                                    <td><label>Time step<input type="range" id="timeConst" min="1" max="10"></label></td>
+                                    <td><button id="pauseButton" type="button">&#x23F8;</button></td>
+                                    <td><label>Time step<br><input type="range" id="timeConst" min="1" max="10"></label></td>
                               </tr>
                               <tr>
                                     <td>
@@ -270,7 +275,7 @@
                         <div id="forces" class="blob">
                               <ul style="list-style-type: none;">
                                     <li>
-                                          <h3 style="display:inline">Force between particles = </h3>
+                                          <h3 style="display:inline">Force between particles <span id="forcePauseSpan">(pause to edit)</span> = </h3>
                                     </li>
                                     <li>
                                           <input id="force0" type="text" value="0" autocomplete="off" spellcheck="false" class="enableOnPause" disabled>
