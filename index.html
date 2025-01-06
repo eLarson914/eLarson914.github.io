@@ -27,12 +27,18 @@
                   table {
                         vertical-align: middle;
                   }
+
+                  ul {
+                        margin: 0px;
+                  }
+                  li {
+                        margin-bottom: 4px;
+                  }
                   
-                  input[type="text"] { width: 200px; }
                   button {
-                        min-width: 80px;
                         border-radius: 5px;
                         background-color: antiquewhite;
+                        border-color: white;
                   }
                   button:hover {
                         background-color: white;
@@ -45,12 +51,13 @@
                         color: antiquewhite;
                   }
                   h3 { 
-                        margin: 0px;
+                        margin: 4px;
                         text-align: center;
                         font-size: 16px;
                         font-weight: normal;
                         font-family: Arial, Helvetica, sans-serif;
                         color: antiquewhite;
+                        font-style: italic;
                   }
 
                   /* font for smaller text */
@@ -78,8 +85,9 @@
                   
                   /* rounded menus */
                   .blob { 
-                        border: 1px solid antiquewhite;
+                        border: 2px solid pink;
                         border-radius: 10px;
+                        border-top-color: white;
                         padding: 12px;
                         min-width: 100px;
                         background-color: rgba(0, 0, 0, 0.8);
@@ -108,6 +116,7 @@
                   }
                   #pauseButton {
                         height: 60px;
+                        width: 80px;
                         font-size: 24px;
                   }
                   #particlesHeaderDiv {
@@ -136,13 +145,15 @@
                   .bottomButton {
                         border-top-left-radius: 6px;
                         border-top-right-radius: 6px;
+                        border-bottom-left-radius: 0px;
+                        border-bottom-right-radius: 0px;
                         border: 0px solid black;
-                        background-color: antiquewhite;
                         padding-top: 4px;
                         padding-bottom: 4px;
                         padding-left: 8px;
                         padding-right: 8px;
                         height: 27px;
+                        min-width: 100px;
                   }
 
                   #particleForm {
@@ -165,7 +176,7 @@
                   <div id="topDiv">
                         <div class="blob" style="flex-shrink: 0;">
                               <table id="uiButtonsTable">
-                                    <tr>
+                                    <tr style="border: 1px solid pink;">
                                           <td><button id="pauseButton" type="button">&#x23F8;</button></td>
                                           <td><label>Time step<br><input type="range" id="timeConst" min="1" max="10"></label></td>
                                     </tr>
@@ -197,19 +208,19 @@
             
             <div id="bottomDiv">
                   <div id="bottomButtons">
-                        <button type="button" class="bottomButton" i="0">Add/delete &#x1F534;</button>
+                        <button type="button" class="bottomButton" i="2">Force &#x1F4A2;</button>
                         <button type="button" class="bottomButton" i="1">Properties &#x1F4CA;</button>
-                        <button type="button" class="bottomButton" i="2">Forces &#x1F4A2;</button>
-                        <button type="button" class="bottomButton" i="4">Info &#x2139;</button>
+                        <button type="button" class="bottomButton" i="0">Add/delete &#x1F534;</button>
                         <button type="button" class="bottomButton" i="3">Examples &#x1F310;</button>
+                        <button type="button" class="bottomButton" i="4">Info &#x2139;</button>
                   </div>
 
                   <div id="blobContainer" style="width: fit-content;">
                         <div id="particleForm" class="blob" style="border-top-right-radius: 0px; border-bottom-right-radius: 0px;">
                               <button id="removeAll" type="button" style="display: block; width: 100%;">Delete all particles &#x2B06;</button>
-                              
+                              <hr>
                               <button type="button" id="addButton" style="display: block; width: 100%;">Add all particles &#x2B07;</button>
-                              
+                              <br>
                               <table>
                                     <tr>
                                           <th></th>
@@ -254,11 +265,12 @@
                                           <td></td>
                                     </tr>
                               </table>
-                              <button type="button" id="newRow" style="min-width:0px">+</button>
+                              <button type="button" id="newRow" style="background-color: lightblue; width: 100%;">+</button>
                         </div>
       
                         <div id="particleTypes" class="blob">
                               <h3>Types of particles<br>&amp their properties</h3>
+                              <hr>
                               <table>
                                     <tr>
                                           <th>Particle type</th>
@@ -288,23 +300,14 @@
                         </div>
       
                         <div id="forces" class="blob">
-                              <ul style="list-style-type: none;">
-                                    <li>
-                                          <h3 style="display:inline">Force between particles <span id="forcePauseSpan">(pause to edit)</span> = </h3>
-                                    </li>
-                                    <li>
-                                          <input id="force0" type="text" value="0" autocomplete="off" spellcheck="false" class="enableOnPause" disabled>
-                                          +
-                                    </li>
-                                    <li>
-                                          <input id="force1" type="text" value="0" autocomplete="off" spellcheck="false" class="enableOnPause" disabled>
-                                          +
-                                    </li>
-                                    <li>
-                                          <input id="force2" type="text" value="0" autocomplete="off" spellcheck="false" class="enableOnPause" disabled>
-                                    </li>
-                              </ul>
-                              <h3 style="margin-top:4px; text-decoration: underline;">Variables</h3>
+                              <div style="text-align: center; margin-bottom: 20px;">
+                                    <h1 style="display: inline;">F = </h1>
+                                    <br>
+                                    <span id="forcePauseSpan" style="color: white; margin-bottom: 6px; display: block; font-family: Arial, Helvetica, sans-serif; font-size: 14px;">(pause to edit)</span>
+                                    <input id="force" type="text" value="0" autocomplete="off" spellcheck="false" class="enableOnPause" style="font-size: 16px; width: 300px;" disabled>
+                              </div>
+                              <hr>
+                              <h3>Variables</h3>
                               <ul>
                                     <li>
                                           <b style="color: pink">dist_sq</b> = distance between particles, squared
@@ -325,7 +328,8 @@
                         </div>
       
                         <div class="blob" style="text-align: center;">
-                              <h3 style="text-decoration: underline;">Examples</h3>
+                              <h3>Examples</h3>
+                              <hr>
                               <ul style="list-style-type: none; padding: 0px;">
                                     <li>
                                           <button exampleName="planets" class="exampleButton" type="button">Solar system</button>
@@ -346,16 +350,16 @@
                         </div>
       
                         <div class="blob">
-                              <h3 style="text-decoration: underline;">Info</h3>
+                              <h3>Info</h3>
+                              <hr>
                               <ul>
-                                    <li>Force equations are calculated between every pair of particles. A positive result is attraction, negative is repulsion.</li>
-                                    <li>Particles with higher mass are pushed less by forces (a = f / m).</li>
+                                    <li>The force equation is calculated between every pair of particles. A positive result is attraction, negative is repulsion.</li>
+                                    <li>Particles with higher mass are pushed less by force (a = f / m).</li>
                                     <li>When particles collide, any equation involving "1 / <b style="color: pink">dist_sq</b>" will become really big so they'll fly everywhere.</li>
-                                    <br>
-                                    <li>Pause to edit force equations. Common functions like "sin(<b style="color: orangered">m1</b>)" or "pi * <b style="color: dodgerblue">c1</b>^2" will work.</li>
-                                    <br>
+                                    <li>Pause to edit the force equation. Common functions like "sin(<b style="color: orangered">m1</b>)" or "pi * <b style="color: dodgerblue">c1</b>^2" will work.</li>
+                                    <hr>
                                     <li>Higher time steps result in more unpredictable behavior.</li>
-                                    <br>
+                                    <hr>
                                     <li>Mouse wheel moves camera forward / back.</li>
                                     <li>Hold shift to temporarily switch between moving and rotating on click.</li>
                               </ul>

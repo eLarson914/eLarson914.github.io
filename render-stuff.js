@@ -399,8 +399,8 @@ function initShaderProgramsAndBuffers() {
 	let anglePerVertex = 2 * Math.PI / numUniqueOutsideVertices;
 	for (let i = 0; i < numUniqueOutsideVertices + 1; i++)
 	{
-		let x = Math.sin(i * anglePerVertex) * 10;
-		let y = Math.cos(i * anglePerVertex) * 10;
+		let x = Math.sin(i * anglePerVertex) * 2;
+		let y = Math.cos(i * anglePerVertex) * 2;
 		bigCircleVertices[i*2 + 0 + 2] = x;
 		bigCircleVertices[i*2 + 1 + 2] = y;
 	}
@@ -432,8 +432,8 @@ function initShaderProgramsAndBuffers() {
 		varying vec3 vDisplacement;
 
 		void main() {
-			float dist_sq = dot(vDisplacement, vDisplacement); //0..0.5..1..10..inf
-			float distInv = 1.0 / (3.0 * dist_sq + 1.0); //1..0.27..0.16..0.02..0
+			float dist_sq = dot(vDisplacement, vDisplacement); //0..0.5..1..2..10..inf
+			float distInv = 1.0 / (10.0 * dist_sq + 1.0) - 0.03; //1..0.27..0.16..0.02..0
 
 			vec4 color = vec4(uColor[0], uColor[1], uColor[2], distInv);
 			gl_FragColor = color;

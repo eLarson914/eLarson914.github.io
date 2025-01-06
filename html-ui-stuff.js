@@ -10,11 +10,7 @@ import {
     setPaused
 } from "./apricot.js";
 
-let forceInputs = [
-    document.getElementById("force0"),
-    document.getElementById("force1"),
-    document.getElementById("force2")
-];
+
 let mInputs = [
     document.getElementById("m0"),
     document.getElementById("m1"),
@@ -53,12 +49,8 @@ export function getTypeCustom(type) {
     return cInputs[type].value;
 }
 
-export function getForceFuncs() {
-	let forceFuncs = [];
-	for (let forceInput of forceInputs) {
-        forceFuncs.push(forceInput.value);
-	}
-	return forceFuncs;
+export function getForceFunc() {
+	return document.getElementById("force").value;
 }
 
 //between 0.01 and 0.1
@@ -113,10 +105,8 @@ function forceValidAfterChange(event) {
 }
 
 function enableDisableForceEquations(paused) {
-    for (let forceInput of forceInputs) {
-        if (paused) forceInput.disabled = false;
-        if (!paused) forceInput.disabled = true;
-    }
+    if (paused) document.getElementById("force").disabled = false;
+    if (!paused) document.getElementById("force").disabled = true;
 }
 
 function setupInputValidListeners() {
@@ -133,10 +123,7 @@ function setupInputValidListeners() {
     }
 
     // FORCE EQUATION
-    for (let forceInput of forceInputs) {
-        //IS DISABLED ON PLAY SO DON'T HAVE TO WORRY EVERY FRAME
-        forceInput.addEventListener("change", forceValidAfterChange);
-    }
+    document.getElementById("force").addEventListener("change", forceValidAfterChange); //MUST BE VALID AFTER CHANGED
 
     //ADD / DELETE POS / VEL XYZ
     for (let xyzInput of document.getElementsByClassName("xyzInput")) {
@@ -155,11 +142,11 @@ function pauseToggle(event) {
     setPaused(newPausedState);
     if (!newPausedState) { //if not paused anymore
         event.target.innerHTML = "&#x23F8;";
-        document.getElementById("forcePauseSpan").innerHTML = "(pause to edit)";
+        document.getElementById("forcePauseSpan").style.display = "block";
     }
     else { //if paused now
         event.target.innerHTML = "&#x23F5;";
-        document.getElementById("forcePauseSpan").innerHTML = "";
+        document.getElementById("forcePauseSpan").style.display = "none";
     }
     enableDisableForceEquations(newPausedState);
 }
@@ -176,9 +163,7 @@ export function loadPreset(preset) {
 	document.getElementById("m2").value = preset.m2;
 	document.getElementById("c2").value = preset.c2;
 
-	document.getElementById("force0").value = preset.force0;
-	document.getElementById("force1").value = preset.force1;
-	document.getElementById("force2").value = preset.force2;
+	document.getElementById("force").value = preset.force;
 
 	for (let typeposvel of preset.particles) {
 		createParticle(typeposvel[0], typeposvel[1], typeposvel[2]);

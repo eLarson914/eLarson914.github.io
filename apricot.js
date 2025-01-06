@@ -7,17 +7,13 @@ import {
 	getTypeColor,
 	getTypeMass,
 	getTypeCustom,
-	getForceFuncs,
+	getForceFunc,
 	getTimeConst,
  } from "./html-ui-stuff.js";
 
 import {
 	setupRenderStuff,
 	drawFrame,
-	//viewportPosToDevicePos,
-	//getCameraProperties,
-	//getWorldtoDeviceCoords,
-	//getDeviceToWorldCoords,
 	queueArrowDraw
 } from "./render-stuff.js";
 
@@ -44,6 +40,9 @@ function main() {
 	setupHTMLUIstuff();
 
 	loadPreset(presets.threeRotations);
+	document.getElementById("force").value = "1";
+	document.getElementById("velArrows").checked = false;
+	document.getElementById("forceArrows").checked = true;
 
 	// animate and draw
 	animateScene();
@@ -62,12 +61,10 @@ function animateScene() {
 	let drawForceArrows = document.getElementById("forceArrows").checked;
 
 	//physics
-	if (!paused && particles.length > 0) {
-		let forceFuncs = getForceFuncs();
-		physicsStep(particles, forceFuncs, getTimeConst(), drawVelArrows, drawForceArrows); //particles array modified in place
-	}
-	else if (drawVelArrows) { //even while paused, draw velocity arrows
-		for (let particle of particles) queueArrowDraw(particle.pos, particle.vel, [0, 1, 0, 1]);
+	if (particles.length > 0) {
+		let forceFunc = getForceFunc();
+		if (!forceFuncValid(forceFunc)) forceFunc = "0";
+		physicsStep(particles, forceFunc, getTimeConst(), paused, drawVelArrows, drawForceArrows); //particles array modified in place
 	}
 
 	//render in webgl
@@ -282,7 +279,7 @@ let presets = {
 		m0: 1000, c0: 1, 
 		m1: 0.01, c1: 1,
 		m2: 1, c2: 1,
-		force0: "0.01 * m1 * m2 / dist_sq", force1: "0", force2: "0",
+		force: "0.01 * m1 * m2 / dist_sq",
 		particles: [
 			[0, [0, 0, 0], [0, 0, 0]],
 			[2, [7, 0, 0], [0, 0, 1.2]],
@@ -291,22 +288,21 @@ let presets = {
 			[2, [0, 0, -2], [2.2, 0, 0]],
 			[2, [0, 0, -18], [0.75, 0, 0]],
 			[1, [0, 0, -18.4], [0.9, 0, 0]],
+			[2, [0, 0, 4], [-1.6, 0, 0]]
 		]
 	},
 	splash: {
 		m0: 1, c0: 1, 
 		m1: 1, c1: 1, 
 		m2: 1, c2: 1,
-		force0: "0.01 / dist_sq", 
-		force1: "0", force2: "0",
+		force: "0.01 / dist_sq",
 		particles: []
 	},
 	bounce: {
 		m0: 1, c0: 1,
 		m1: 1, c1: 1, 
 		m2: 1, c2: 1,
-		force0: "1 / dist_sq", 
-		force1: "-1 / dist_sq^3", force2: "0",
+		force: "(1 / dist_sq) - (1 / dist_sq^3)",
 		particles: [
 			[0, [5, 0, 0], [0, 0, 0]],
 			[0, [-5, 0, 0], [0, 0, 0]],
@@ -320,8 +316,7 @@ let presets = {
 		m0: 1, c0: 1,
 		m1: 1, c1: 1, 
 		m2: 1, c2: 1,
-		force0: "-1 / dist_sq", 
-		force1: "0.2", force2: "0",
+		force: "0.2 - (1 / dist_sq)",
 		particles: [
 			[1, [2, 0, 0], [0, 0, 0]],
 			[1, [-2, 0, 0], [0, 0, 0]],
@@ -335,8 +330,7 @@ let presets = {
 		m0: 1, c0: 1,
 		m1: 1, c1: 1, 
 		m2: 1, c2: 1,
-		force0: "0.1", 
-		force1: "0", force2: "0",
+		force: "0.1",
 		particles: [
 			[0, [2, 0, 0], [0, 1, 0]],
 			[0, [-2, 0, 0], [0, -1, 0]],
