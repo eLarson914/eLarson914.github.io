@@ -290,7 +290,10 @@ export function setupHTMLUIstuff() {
             canvas.style.cursor = "grabbing";
 			
             if (event.button == 2) { //right click
-                document.getElementById("rotate").checked = true;
+
+                //if move button checked
+                if (document.getElementById("move").checked) document.getElementById("rotate").checked = true;
+                else document.getElementById("move").checked = true;
                 canvas.style.cursor = "grabbing";
             }
 			event.preventDefault();
@@ -304,7 +307,9 @@ export function setupHTMLUIstuff() {
 			mouseMoveState = 0; //not moving camera
 
             if (event.button == 2) {
-                document.getElementById("move").checked = true;
+                //if rotate button checked, switch to move
+                if (document.getElementById("rotate").checked) document.getElementById("move").checked = true;
+                else document.getElementById("rotate").checked = true;
             }
 		}
 	);
