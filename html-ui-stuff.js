@@ -29,10 +29,7 @@ let colorInputs = [
 
 //for mouse movement
 //0: no movement
-//1: moving camera
-//2: moving cursor3d along x axis
-//3: moving cursor3d along y axis
-//4: moving cursor3d along z axis
+//1: moving or rotating camera
 let mouseMoveState = 0;
 
 let canvas = document.getElementById("gl-canvas");
@@ -173,15 +170,25 @@ export function loadPreset(preset) {
 
 //when bottom button is pressed, open "Add/delete" or "Properties" or "Forces" menu etc.
 function showMenu(event) {
-    let i = event.target.getAttribute("i");
+    let n = event.target.getAttribute("n");
 
-    for (let j = 0; j < document.getElementById("blobContainer").children.length; j++) {
-        let menu = document.getElementById("blobContainer").children[j];
-        if (i == j) {
-            if (menu.style.display == "none") menu.style.display = "block";
-            else menu.style.display = "none";
+    for (let i = 0; i < document.getElementById("bottomButtons").children.length; i++) {
+        let button = document.getElementById("bottomButtons").children[i];
+        let menu = document.getElementById("bottomBlobs").children[i];
+        if (i == n) {
+            if (menu.style.display == "none") {
+                button.style = "background-color: antiquewhite; color: black;"
+                menu.style.display = "block";
+            }
+            else {
+                button.style = null;
+                menu.style.display = "none";
+            }
         }
-        else menu.style.display = "none";
+        else {
+            button.style = null;
+            menu.style.display = "none";
+        }
     }
 }
 
@@ -242,49 +249,16 @@ function newRow() {
     rowClone.children[rowClone.children.length - 1].appendChild(button);
 }
 
-// =====================================================================================
-
-function keyPressedDown(event) {
-    if (event.key == "Shift" && event.repeat == false) {
-        if (document.getElementById("rotate").checked) document.getElementById("move").click();
-        else document.getElementById("rotate").click();
-    }
-}
-
-function keyUnpressed(event) {
-    if (event.key == "Shift") {
-        if (document.getElementById("rotate").checked) document.getElementById("move").click();
-        else document.getElementById("rotate").click();
-    }
-}
-
-
 // MOUSE STUFF =======================================================
 
 function onMouseMove(event) {
     if (mouseMoveState == 0) {
         canvas.style.cursor = "grab";
-        return;
     }
-    //else if (mouseMoveState == 1) { //moving
-
-        //get proper action based on radio inputs on canvas
-
-    let rotating = document.getElementById("rotate").checked;
-    
-    moveCameraClick(event.movementX, event.movementY, rotating);
-    //}
-    /*
-    else if (mouseMoveState == 2) {
-        moveCursor3dToMouse(event.clientX, event.clientY, [1, 0, 0]);
+    else {
+        let rotating = document.getElementById("rotate").checked;
+        moveCameraClick(event.movementX, event.movementY, rotating);
     }
-    else if (mouseMoveState == 3) {
-        moveCursor3dToMouse(event.clientX, event.clientY, [0, 1, 0]);
-    }
-    else if (mouseMoveState == 4) {
-        moveCursor3dToMouse(event.clientX, event.clientY, [0, 0, 1]);
-    }
-    */
 }
 
 let touchLast = null;
@@ -308,38 +282,30 @@ function onTouchEnd(event) {
 // ==========================================================================
 
 
-
-
-
-
-
 export function setupHTMLUIstuff() {
     //mouse click starts camera move
 	canvas.addEventListener(
 		"mousedown", (event) => {
-			if (event.button == 0) {
-				/*
-				let clickingCursor3dArrow = checkCursor3dClick(event.clientX, event.clientY);
-				if (clickingCursor3dArrow != 0) {
-					mouseMoveState = clickingCursor3dArrow; //moving 3d cursor
-				}
-				else {
-					mouseMoveState = 1; //moving camera
-				}
-				*/
-				mouseMoveState = 1; //moving camera
-                canvas.style.cursor = "grabbing";
-			}
-			event.preventDefault();
+            mouseMoveState = 1; //moving camera
+            canvas.style.cursor = "grabbing";
 			
+            if (event.button == 2) { //right click
+                document.getElementById("rotate").checked = true;
+                canvas.style.cursor = "grabbing";
+            }
+			event.preventDefault();
 	});
 	canvas.addEventListener("mousemove", onMouseMove); //mouse move
 	canvas.addEventListener("touchmove", onTouchMove); //mobile touch move
 	canvas.addEventListener("touchstart", onTouchStart); //mobile touch start
 	canvas.addEventListener("touchend", onTouchEnd); //mobile touch end
 	document.addEventListener( //mouse up ends camera move
-		"mouseup", () => {
+		"mouseup", (event) => {
 			mouseMoveState = 0; //not moving camera
+
+            if (event.button == 2) {
+                document.getElementById("move").checked = true;
+            }
 		}
 	);
 	canvas.addEventListener("wheel", (event) => { //mouse wheel moves camera forward
@@ -366,8 +332,8 @@ export function setupHTMLUIstuff() {
 
     //buttons at bottom tab for opening menus
     for (let bottomButton of document.getElementsByClassName("bottomButton")) {
-        let i = bottomButton.getAttribute("i");
-        let menu = document.getElementById("blobContainer").children[i];
+        let n = bottomButton.getAttribute("n");
+        let menu = document.getElementById("bottomBlobs").children[n];
         menu.style.display = "none";
 
         bottomButton.addEventListener("click", showMenu);
@@ -383,9 +349,6 @@ export function setupHTMLUIstuff() {
     for (let exampleButton of document.getElementsByClassName("exampleButton")) {
         exampleButton.addEventListener("click", () => loadPreset(getPreset(exampleButton.getAttribute("exampleName"))));
     }
-
-    addEventListener("keydown", keyPressedDown);
-    addEventListener("keyup", keyUnpressed);
 
     setupInputValidListeners();
 }

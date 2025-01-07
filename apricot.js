@@ -41,8 +41,8 @@ function main() {
 
 	loadPreset(presets.threeRotations);
 	document.getElementById("force").value = "1";
-	document.getElementById("velArrows").checked = false;
-	document.getElementById("forceArrows").checked = true;
+	document.getElementById("velArrows").checked = true;
+	document.getElementById("forceArrows").checked = false;
 
 	// animate and draw
 	animateScene();
