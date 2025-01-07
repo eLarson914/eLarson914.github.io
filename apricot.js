@@ -1,4 +1,3 @@
-
 import { physicsStep } from "./physics.js";
 
 import { 
@@ -23,9 +22,6 @@ let camera = {
 	pos: [0, 7, 12],
 	rot: [-Math.PI/6, 0] //rotation around X (tilt up/down), rotation around Y (pan right/left)
 }
-
-//for where to add particles
-//let cursor3d = [0, 0, 0];
 
 let paused = false;
 
@@ -213,62 +209,6 @@ export function vec3copy(vec) {
 	let copy = vec3.create(); vec3.copy(copy, vec);
 	return copy;
 }
-
-//3D CURSOR STUFF ------------------------------------------------------
-
-/*
-
-function moveCursor3dToMouse(mouseClientX, mouseClientY, axis) {
-	let mousePosDev = viewportPosToDevicePos(mouseClientX, mouseClientY);
-	mousePosDev = [mousePosDev[0], mousePosDev[1], 0, 1];
-	let mousePosWorld = getDeviceToWorldCoords(mousePosDev);
-
-	let mousePointDirectionWorld = vec3.create();
-	vec3.subtract(mousePointDirectionWorld, mousePosWorld, camera.pos);
-	vec3.normalize(mousePointDirectionWorld, mousePointDirectionWorld);
-
-	let cursorPos = vec3copy(cursor3d);
-
-	let p = nearestPoint(cursorPos, axis, camera.pos, mousePointDirectionWorld);
-	vec3.subtract(p, p, axis);
-	cursor3d = p;
-}
-
-//returns point on line 1 closest to line 2
-function nearestPoint(p1, d1, p2, d2) {
-	let n = vec3.create(); vec3.cross(n, d1, d2);
-	let n2 = vec3.create(); vec3.cross(n2, d2, n);
-	let num = vec3.create(); vec3.subtract(num, p2, p1);
-	num = vec3.dot(num, n2);
-	let den = vec3.dot(d1, n2);
-	let c1 = vec3.create(); vec3.scale(c1, d1, num / den);
-	vec3.add(c1, p1, c1);
-	return c1;
-}
-
-function proj(v1, onto) { //project vec1 onto vec2
-	return math.multiply(onto, math.divide(math.dot(v1, onto), math.dot(onto, onto)));
-}
-
-function checkCursor3dClick(clientX, clientY) {
-	let xArrowCoord = vec3.create(); vec3.add(xArrowCoord, cursor3d, [1, 0, 0]);
-	let yArrowCoord = vec3.create(); vec3.add(yArrowCoord, cursor3d, [0, 1, 0]);
-	let zArrowCoord = vec3.create(); vec3.add(zArrowCoord, cursor3d, [0, 0, 1]);
-	xArrowCoord = getWorldtoDeviceCoords(xArrowCoord);
-	yArrowCoord = getWorldtoDeviceCoords(yArrowCoord);
-	zArrowCoord = getWorldtoDeviceCoords(zArrowCoord);
-
-	let mousePos = viewportPosToDevicePos(clientX, clientY);
-
-	let clickDistance = 30 / canvas.clientHeight;
-
-	if (vec2.distance(xArrowCoord, mousePos) < clickDistance) return 2;
-	else if (vec2.distance(yArrowCoord, mousePos) < clickDistance) return 3;
-	else if (vec2.distance(zArrowCoord, mousePos) < clickDistance) return 4;
-	return 0;
-}
-
-*/
 
 export function getPreset(name) {
 	return presets[name];
