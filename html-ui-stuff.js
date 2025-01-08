@@ -243,7 +243,7 @@ function newRow() {
 
     let button = document.createElement("button");
     button.setAttribute("type", "button");
-    button.setAttribute("style", "min-width: 0px; background-color: red; color:white;");
+    button.setAttribute("class", "xButton");
     button.innerHTML = "x";
     button.addEventListener("click", () => rowClone.remove());
     rowClone.children[rowClone.children.length - 1].appendChild(button);
@@ -327,7 +327,7 @@ export function setupHTMLUIstuff() {
 	document.getElementById("pauseButton").addEventListener("click", pauseToggle);
 
     //remove all particles button
-	document.getElementById("removeAll").addEventListener("click", deleteParticlesAll);
+	document.getElementById("deleteButton").addEventListener("click", deleteParticlesAll);
 
     //add particles from form button
 	document.getElementById("addButton").addEventListener("click", addParticlesFromInput);

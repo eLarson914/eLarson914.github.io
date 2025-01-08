@@ -178,6 +178,39 @@
                         border-top-right-radius: 0px;
                         border-bottom-right-radius: 0px;
                   }
+
+                  #addButton {
+                        display: block;
+                        width: 100%;
+                        background-color: darkgreen;
+                        color: white;
+                        font-size: 15px;
+                  }
+                  #addButton:hover {
+                        background-color: white;
+                        color: darkgreen;
+                  }
+
+                  #deleteButton {
+                        display: block;
+                        width: 100%;
+                        background-color: darkred;
+                        color: white;
+                        font-size: 15px;
+                  }
+                  #deleteButton:hover {
+                        background-color: white;
+                        color: darkred;
+                  }
+
+                  .xButton {
+                        min-width: 0px;
+                        background-color: red;
+                        color:white;
+                  }
+                  .xButton:hover {
+                        color: red;
+                  }
             </style>
 
             <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -289,9 +322,9 @@
                               </div>
 
                               <div id="particleForm" class="blob">
-                                    <button id="removeAll" type="button" style="display: block; width: 100%;">Delete all particles &#x2B06;</button>
+                                    <button id="deleteButton" type="button">- Delete all particles &#x2B06;</button>
                                     <hr style="border-color: hotpink;">
-                                    <button type="button" id="addButton" style="display: block; width: 100%;">Add all particles &#x2B07;</button>
+                                    <button id="addButton" type="button">+ Add particles &#x2B07;</button>
                                     <br>
                                     <table>
                                           <tr>
@@ -337,7 +370,7 @@
                                                 <td></td>
                                           </tr>
                                     </table>
-                                    <button type="button" id="newRow" style="width: 100%;">+</button>
+                                    <button type="button" id="newRow" style="width: 100%;">Additional particle</button>
                               </div>
             
                               <div class="blob" style="text-align: center;">
@@ -358,6 +391,8 @@
                                           <hr style="border-color: hotpink;">
                                           <li>Left click moves camera, right click rotates camera.</li>
                                           <li>Mouse wheel moves camera forward / back.</li>
+                                          <hr>
+                                          <li>Code at <a href="https://github.com/eLarson914/eLarson914.github.io">https://github.com/eLarson914/eLarson914.github.io</a></li>
                                     </ul>
                               </div>
                         </div>
