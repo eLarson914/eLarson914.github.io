@@ -286,14 +286,6 @@ export function setupHTMLUIstuff() {
 		"mousedown", (event) => {
             mouseMoveState = 1; //moving camera
             canvas.style.cursor = "grabbing";
-			
-            if (event.button == 2) { //right click
-
-                //if move button checked
-                if (document.getElementById("move").checked) document.getElementById("rotate").checked = true;
-                else document.getElementById("move").checked = true;
-                canvas.style.cursor = "grabbing";
-            }
 			event.preventDefault();
 	});
 	canvas.addEventListener("mousemove", onMouseMove); //mouse move
@@ -303,12 +295,6 @@ export function setupHTMLUIstuff() {
 	document.addEventListener( //mouse up ends camera move
 		"mouseup", (event) => {
 			mouseMoveState = 0; //not moving camera
-
-            if (event.button == 2) {
-                //if rotate button checked, switch to move
-                if (document.getElementById("rotate").checked) document.getElementById("move").checked = true;
-                else document.getElementById("rotate").checked = true;
-            }
 		}
 	);
 	canvas.addEventListener("wheel", (event) => { //mouse wheel moves camera forward
