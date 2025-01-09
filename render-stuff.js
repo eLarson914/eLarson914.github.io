@@ -23,9 +23,11 @@ let gl = document.getElementById("gl-canvas").getContext("webgl");
 const fovY = Math.PI / 4;
 let aspect = gl.canvas.width / gl.canvas.height;
 const zNear = 0.1;
-const zFar = 100.0;
+const zFar = 1000.0;
 
 let viewMat = mat4.create();
+let camYrot = 0;
+let camXrot = 0;
 
 let arrowsToDraw = [];
 
@@ -42,7 +44,7 @@ export function setupRenderStuff() {
 	addEventListener("resize", resize);
 }
 
-export function drawFrame(particlesArray, camera) {//, cursor3d) {
+export function drawFrame(particlesArray, camera) {
 	gl.clearColor(0, 0, 0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -53,7 +55,7 @@ export function drawFrame(particlesArray, camera) {//, cursor3d) {
 
     //PARTICLES FOR LOOP
     for (let i = 0; i < particlesArray.length; i++) {
-        drawParticle(particlesArray[i], camera);
+        drawParticle(particlesArray[i]);
     }
 
 	//DRAW ARROWS
@@ -61,25 +63,20 @@ export function drawFrame(particlesArray, camera) {//, cursor3d) {
 		drawArrow(arrow[0], arrow[1], arrow[2]);
 	}
 	arrowsToDraw = [];
-
-	//DRAW 3D CURSOR
-	//drawCursor3d(cursor3d);
 	
 	//DRAW AXIS ARROWS
 	drawAxisArrows();
 }
 
-function drawParticle(particle, camera) {
-	let particlePosMat = mat4.create();
-    mat4.translate(particlePosMat, particlePosMat, particle.pos); //translation to particlePos
-    let uMat = mat4.create();
-    mat4.multiply(uMat, viewMat, particlePosMat); //viewMat * translation
+function drawParticle(particle) {
+	let uMat = mat4.create();
+    mat4.translate(uMat, uMat, particle.pos); //translation to particlePos
+    mat4.multiply(uMat, viewMat, uMat); //viewMat * translation
 
-    //BOTH CIRCLES counteract rotation so they always face camera
-    let counteractRotationMat = mat4.create();
-    mat4.rotateY(counteractRotationMat, counteractRotationMat, camera.rot[1]);
-    mat4.rotateX(counteractRotationMat, counteractRotationMat, camera.rot[0]);
-    mat4.multiply(uMat, uMat, counteractRotationMat);
+	mat4.rotateY(uMat, uMat, -camYrot); //rotateY opposite of camera's rotation
+	mat4.rotateX(uMat, uMat, -camXrot); //rotateX opposite of camera's rotation
+	
+	
 
     //BIGCIRCLE -----------------------------------
     gl.useProgram(bigCircleShaderProgram);
@@ -107,25 +104,6 @@ function drawParticle(particle, camera) {
     
     gl.drawArrays(gl.TRIANGLE_FAN, 0, circleVertexCount);
 }
-
-/*
-function drawCursor3d(cursor3d) {
-	const axisDirections = [
-		[1, 0, 0], //X
-		[0, 1, 0], //Y
-		[0, 0, 1] //Z
-	];
-	const colors = [
-		[1, 0, 0, 1], //X red
-		[0, 1, 0, 1], //Y green
-		[0, 0, 1, 1], //Z blue
-	];
-
-	for (let i = 0; i < 3; i++) { //for each axis xyz
-		drawArrow(cursor3d, axisDirections[i], colors[i]);
-	}
-}
-	*/
 
 function drawAxisArrows() {
 	const axisDirections = [
@@ -155,8 +133,6 @@ function drawArrow(pos, displacement, uColor = [1, 1, 1, 1]) {
 	//uMatrix
 	let uMatrix = mat4.create();
 	mat4.translate(uMatrix, uMatrix, pos);
-
-	
 
 	let rotationAxis = vec3.create(); //axis to rotate the arrow around to point it the right way
 	
@@ -266,21 +242,23 @@ function colorHexToRGB(hex) {
 
 //multiplying view matrix by a vec3 gets its position in screen space
 function setViewMat(camera) {
-	//projection matrix
-	let projectionMatrix = mat4.create();
-	mat4.perspective(projectionMatrix, fovY, aspect, zNear, zFar);
-	//mat4.ortho(projectionMatrix, -10, 10, -10, 10, 0.1, 100);
+	camYrot = vec3.angle([0, 0, 1], [camera[0], 0, camera[2]]);
+	if (camera[0] > 0) camYrot *= -1;
 
+	camXrot = vec3.angle([camera[0], 0, camera[2]], camera);
+	if (camera[1] < 0) camXrot *= -1;
 
-	//camera matrix - camera's rotation and position in world space
-    let cameraMat = mat4.create(); //identity
-    mat4.translate(cameraMat, cameraMat, camera.pos); //translation to camera.pos
-    mat4.rotateY(cameraMat, cameraMat, camera.rot[1]); //pan around y axis FIRST
-    mat4.rotateX(cameraMat, cameraMat, camera.rot[0]); //THEN tilt around x axis
-    
-	//view matrix - inverting the camera transformations and projecting to 2D
-    mat4.invert(viewMat, cameraMat);
-    mat4.multiply(viewMat, projectionMatrix, viewMat);
+	//projection matrix has to be calculated every frame because of gl canvas resize and aspect ratio
+	let projectionMat = mat4.create();
+	mat4.perspective(projectionMat, fovY, aspect, zNear, zFar);
+
+	//view matrix is identity <- rotateX <- rotateY <- translate
+	viewMat = mat4.create();
+	mat4.rotateX(viewMat, viewMat, camXrot); //rotateX opposite of camera's rotation
+	mat4.rotateY(viewMat, viewMat, camYrot); //rotateY opposite of camera's rotation
+	mat4.translate(viewMat, viewMat, [-camera[0], -camera[1], -camera[2]]); //translate to opposite of camera's position
+
+    mat4.multiply(viewMat, projectionMat, viewMat);
 }
 
 export function getWorldtoDeviceCoords(pWorld) {

@@ -17,11 +17,10 @@ import {
 } from "./render-stuff.js";
 
 import * as vec3 from './gl-matrix/vec3.js';
+import * as mat4 from "./gl-matrix/mat4.js";
 
-let camera = {
-	pos: [0, 7, 12],
-	rot: [-Math.PI/6, 0] //rotation around X (tilt up/down), rotation around Y (pan right/left)
-}
+let camera = [5, 5, 13];
+//distance from (0, 0, 0) along Z axis, rotation around X, rotation around Y
 
 let paused = false;
 
@@ -36,7 +35,6 @@ function main() {
 	setupHTMLUIstuff();
 
 	loadPreset(presets.threeRotations);
-	document.getElementById("force").value = "1";
 	document.getElementById("velArrows").checked = true;
 	document.getElementById("forceArrows").checked = false;
 
@@ -64,7 +62,7 @@ function animateScene() {
 	}
 
 	//render in webgl
-	drawFrame(particles, camera);//, cursor3d);
+	drawFrame(particles, camera);
 
 	//check if particles should be deleted (too far away)
 	deleteParticlesIfNeeded();
@@ -100,55 +98,24 @@ export function isPaused() {
 	return paused;
 }
 
-export function moveCameraClick(deltaX, deltaY, rotating) {
-	if (rotating) {
-		//rotate camera
-		camera.rot[0] += deltaY * 0.001;
-		camera.rot[1] += deltaX * 0.001;
-	}
-	else {
-		//move camera
+export function moveCameraClick(deltaX, deltaY) {
 
-		//local space
-		let move = [-deltaX * 0.02, deltaY * 0.02, 0];
-		
-		//rotate with camera rotation
-		vec3.rotateX(
-			move, //out
-			move, //vec3 to rotate
-			[0, 0, 0], //origin
-			camera.rot[0] //angle in rad
-		);
-		
-		vec3.rotateY(
-			move, //out
-			move, //vec3 to rotate
-			[0, 0, 0], //origin
-			camera.rot[1] //angle in rad
-		);
-		camera.pos[0] += move[0];
-		camera.pos[1] += move[1];
-		camera.pos[2] += move[2];
+	vec3.rotateY(camera, camera, [0, 0, 0], -deltaX * 0.01);
+	
+	//make sure camera doesn't rotate over the top
+	if (vec3.angle(camera, [0, 1, 0]) > deltaY * 0.01 && vec3.angle(camera, [0, -1, 0]) > -deltaY * 0.01) {
+		//axis to rotate around when mouse goes up and down
+		let axis = vec3.create();
+		vec3.cross(axis, camera, [0, 1, 0]);
+		//making rotation mat saves me having to do math
+		let mat = mat4.create(); mat4.rotate(mat, mat, deltaY * 0.01, axis);
+		//rotate camera
+		vec3.transformMat4(camera, camera, mat);
 	}
 }
 
 export function moveCameraScroll(amt) {
-	let move = [0, 0, amt];
-	vec3.rotateX(
-		move, //out
-		move, //vec3 to rotate
-		[0, 0, 0], //origin
-		camera.rot[0] //angle in rad
-	);
-	vec3.rotateY(
-		move, //out
-		move, //vec3 to rotate
-		[0, 0, 0], //origin
-		camera.rot[1] //angle in rad
-	);
-	camera.pos[0] += move[0];
-	camera.pos[1] += move[1];
-	camera.pos[2] += move[2];
+	vec3.scale(camera, camera, 1 + amt * 0.1);
 }
 
 // PARTICLE -------------------------------------------------------------

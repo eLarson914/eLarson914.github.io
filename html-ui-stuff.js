@@ -29,7 +29,7 @@ let colorInputs = [
 
 //for mouse movement
 //0: no movement
-//1: moving or rotating camera
+//1: moving camera
 let mouseMoveState = 0;
 
 let canvas = document.getElementById("gl-canvas");
@@ -256,8 +256,7 @@ function onMouseMove(event) {
         canvas.style.cursor = "grab";
     }
     else {
-        let rotating = document.getElementById("rotate").checked;
-        moveCameraClick(event.movementX, event.movementY, rotating);
+        moveCameraClick(event.movementX, event.movementY);
     }
 }
 
@@ -270,8 +269,7 @@ function onTouchMove(event) {
     let deltaX = event.touches[0].clientX - touchLast[0];
     let deltaY = event.touches[0].clientY - touchLast[1];
 
-    let rotating = document.getElementById("rotate").checked;
-    moveCameraClick(deltaX, deltaY, rotating);
+    moveCameraClick(deltaX, deltaY);
     touchLast[0] = event.touches[0].clientX;
     touchLast[1] = event.touches[0].clientY;
 }
@@ -343,9 +341,6 @@ export function setupHTMLUIstuff() {
 
         bottomButton.addEventListener("click", showMenu);
     }
-
-    //radio for what happens when you drag mouse on screen
-	document.getElementById("move").checked = true; 
 
     //time constant slider
 	document.getElementById("timeConst").value = "2";
