@@ -19,7 +19,7 @@ import {
 import * as vec3 from './gl-matrix/vec3.js';
 import * as mat4 from "./gl-matrix/mat4.js";
 
-let camera = [5, 5, 13];
+let camera = [4, 3, 9];
 //distance from (0, 0, 0) along Z axis, rotation around X, rotation around Y
 
 let paused = false;
