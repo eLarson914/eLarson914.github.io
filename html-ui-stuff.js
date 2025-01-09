@@ -67,7 +67,7 @@ export function getTimeConst() {
 // FORCE EQUATION MUST BE VALID
 
 // AFTER INPUT CHANGE:
-// THE ADD / DELETE FORM'S POS XYZ / VEL XYZ FIELDS MUST NOT BE EMPTY
+// THE ADD / DELETE MENU'S POS XYZ / VEL XYZ FIELDS MUST NOT BE EMPTY
 
 function massNotZeroWhenPlaying(event) {
     if (!isPaused()) { //if not paused
@@ -124,7 +124,7 @@ function setupInputValidListeners() {
 
     //ADD / DELETE POS / VEL XYZ
     for (let xyzInput of document.getElementsByClassName("xyzInput")) {
-        xyzInput.addEventListener("change", numberInputNotEmptyAfterChange);
+        xyzInput.addEventListener("change", numberInputNotEmptyAfterChange); //CANNOT BE EMPTY AFTER CHANGED
     }
 }
 
@@ -138,12 +138,12 @@ function pauseToggle(event) {
     let newPausedState = !isPaused();
     setPaused(newPausedState);
     if (!newPausedState) { //if not paused anymore
-        event.target.innerHTML = "&#x23F8;";
-        document.getElementById("forcePauseSpan").style.display = "block";
+        event.target.innerHTML = "&#x23F8;"; //play symbol
+        document.getElementById("forcePauseSpan").style.display = "block"; //show the span in the force menu that tells the user that they have to pause to edit
     }
     else { //if paused now
-        event.target.innerHTML = "&#x23F5;";
-        document.getElementById("forcePauseSpan").style.display = "none";
+        event.target.innerHTML = "&#x23F5;"; //pause symbol
+        document.getElementById("forcePauseSpan").style.display = "none"; //hide span
     }
     enableDisableForceEquations(newPausedState);
 }
@@ -199,7 +199,7 @@ function showMenu(event) {
 //ADD / DELETE MENU =======================================================================
 
 function addParticlesFromInput() {
-    for (let tr of document.getElementsByClassName("particleTr")) {
+    for (let tr of document.getElementsByClassName("particleTr")) { //for each table row of input elements in the add/delete menu
         let type = Number(tr.children[0].children[0].value) - 1;
         let pos = [
             tr.children[2].children[0].value,
@@ -233,15 +233,15 @@ function addParticlesFromInput() {
 
 //adds new row to Add/delete menu
 function newRow() {
-    let rowClone = document.getElementById("firstTr").cloneNode(true);
+    let rowClone = document.getElementById("firstTr").cloneNode(true); //clone first row of add table
     document.getElementById("firstTr").parentElement.appendChild(rowClone);
     let numberInputIndeces = [2, 3, 4, 6, 7, 8];
-    for (let i of numberInputIndeces) {
+    for (let i of numberInputIndeces) { //set new number inputs to 0, add proper event listener to make sure it's nevery empty
         rowClone.children[i].children[0].value = 0;
         rowClone.children[i].children[0].addEventListener("change", numberInputNotEmptyAfterChange);
     }
 
-    let button = document.createElement("button");
+    let button = document.createElement("button"); //x button to delete this when clicked
     button.setAttribute("type", "button");
     button.setAttribute("class", "xButton");
     button.innerHTML = "x";
@@ -313,10 +313,10 @@ export function setupHTMLUIstuff() {
     //remove all particles button
 	document.getElementById("deleteButton").addEventListener("click", deleteParticlesAll);
 
-    //add particles from form button
+    //add particles from add/delete menu button
 	document.getElementById("addButton").addEventListener("click", addParticlesFromInput);
 
-    //new row for add particles form
+    //new row for add particles menu
 	document.getElementById("newRow").addEventListener("click", newRow);
 
     //buttons at bottom tab for opening menus

@@ -19,8 +19,7 @@ import {
 import * as vec3 from './gl-matrix/vec3.js';
 import * as mat4 from "./gl-matrix/mat4.js";
 
-let camera = [4, 3, 9];
-//distance from (0, 0, 0) along Z axis, rotation around X, rotation around Y
+let camera = [4, 3, 9]; //camera pos
 
 let paused = false;
 
@@ -43,7 +42,7 @@ function main() {
 }
 
 function animateScene() {
-	//update particle mass / c / color from input fields
+	//update particle mass / custom / color from input fields
 	for (let particle of particles) {
 		let type = particle.type; //int index
 		particle.mass = getTypeMass(type);
